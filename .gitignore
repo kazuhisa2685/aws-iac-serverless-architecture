@@ -1,0 +1,5 @@
+memo.md
+.DS_Store
+.terraform
+.terraform.*
+*tfstate*
