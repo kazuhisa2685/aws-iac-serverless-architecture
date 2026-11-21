@@ -102,7 +102,7 @@ resource "aws_iam_role" "lambda" {
 data "aws_iam_policy_document" "lambda_permissions" {
   # このテーブルへの書き込み・読み取りだけ許可
   statement {
-    actions   = ["dynamodb:PutItem", "dynamodb:GetItem"]
+    actions   = ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:DeleteItem"]
     resources = [aws_dynamodb_table.items.arn]
   }
 
@@ -212,6 +212,14 @@ resource "aws_apigatewayv2_route" "post_item" {
 resource "aws_apigatewayv2_route" "get_item" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "GET /items/{id}"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_route" "delete_item" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "DELETE /items/{id}"
   target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id

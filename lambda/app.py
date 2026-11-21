@@ -28,6 +28,17 @@ def handler(event, context):
         item = {"id": str(uuid.uuid4()), "data": body}
         table.put_item(Item=item)
         return response(201, item)
+    
+    # DELETE /items/{id} : データを削除
+    if route == "DELETE /items/{id}":
+        try:
+            item_id = event["pathParameters"]["id"]
+            result = table.delete_item(Key={"id": item_id}, ReturnValues="ALL_OLD")
+            if "Attributes" not in result:
+                return response(404, {"message": "not found"})
+            return response(200, {"message": "deleted"})
+        except Exception as e:
+            return response(500, {"message": str(e)})  
 
     # GET /items/{id} : データを取得
     if route == "GET /items/{id}":
