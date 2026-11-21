@@ -1,6 +1,7 @@
 memo.md
 .DS_Store
-.terraform
-.terraform.*
-*tfstate*
-*sh*
+.terraform/
+*.tfstate
+*.tfstate.*
+*.sh
+*.hcl
