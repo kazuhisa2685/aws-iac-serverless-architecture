@@ -3,3 +3,4 @@ memo.md
 .terraform
 .terraform.*
 *tfstate*
+*sh*
