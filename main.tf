@@ -49,22 +49,40 @@ module "function" {
   table_name   = module.database.table_name
   table_arn    = module.database.table_arn
   source_file  = "${path.root}/lambda/app.py"
-  archive_path = "${path.root}/lambda.zip"
+  archive_path = "${path.root}/.terraform/lambda.zip"
+}
+
+module "web" {
+  source = "./modules/web_hosting"
+  name   = local.name
+  region = var.region
 }
 
 module "identity" {
-  source = "./modules/cognito"
-  name   = local.name
+  source       = "./modules/cognito"
+  name         = local.name
+  region       = var.region
+  callback_url = module.web.frontend_url
 }
 
 module "api" {
-  source        = "./modules/http_api"
-  name          = local.name
-  region        = var.region
-  user_pool_id  = module.identity.user_pool_id
-  client_id     = module.identity.client_id
-  function_name = module.function.function_name
-  invoke_arn    = module.function.invoke_arn
+  source          = "./modules/http_api"
+  name            = local.name
+  region          = var.region
+  user_pool_id    = module.identity.user_pool_id
+  client_id       = module.identity.client_id
+  function_name   = module.function.function_name
+  invoke_arn      = module.function.invoke_arn
+  frontend_origin = module.web.frontend_url
+}
+
+module "web_assets" {
+  source         = "./modules/web_assets"
+  bucket_name    = module.web.bucket_name
+  api_url        = module.api.api_url
+  region         = var.region
+  client_id      = module.identity.client_id
+  cognito_domain = module.identity.domain_url
 }
 
 module "monitoring" {
@@ -76,6 +94,10 @@ module "monitoring" {
 
 output "api_url" {
   value = module.api.api_url
+}
+
+output "frontend_url" {
+  value = module.web.frontend_url
 }
 
 output "user_pool_id" {

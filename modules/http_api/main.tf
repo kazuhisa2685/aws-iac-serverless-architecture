@@ -1,6 +1,13 @@
 resource "aws_apigatewayv2_api" "main" {
   name          = "${var.name}-api"
   protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = [var.frontend_origin]
+    allow_methods = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers = ["authorization", "content-type"]
+    max_age       = 300
+  }
 }
 
 resource "aws_apigatewayv2_authorizer" "cognito" {
@@ -30,9 +37,25 @@ resource "aws_apigatewayv2_route" "post_item" {
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
+resource "aws_apigatewayv2_route" "list_items" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "GET /items"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 resource "aws_apigatewayv2_route" "get_item" {
   api_id             = aws_apigatewayv2_api.main.id
   route_key          = "GET /items/{id}"
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_route" "update_item" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "PUT /items/{id}"
   target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id

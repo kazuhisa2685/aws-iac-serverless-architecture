@@ -21,3 +21,7 @@ variable "function_name" {
 variable "invoke_arn" {
   type = string
 }
+
+variable "frontend_origin" {
+  type = string
+}

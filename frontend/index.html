@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f6fb">
+    <title>Items | Serverless API</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">SERVERLESS DEMO</p>
+          <h1>Items</h1>
+          <p class="subtitle">Cognito でサインインして、自分のアイテムを管理します。</p>
+        </div>
+        <button id="sign-out" class="button button-quiet" type="button" hidden>サインアウト</button>
+      </header>
+
+      <section id="login-panel" class="panel login-panel">
+        <h2>サインイン</h2>
+        <p class="muted">ユーザーは Cognito 管理者が作成します。</p>
+        <button id="login-button" class="button" type="button">Cognito でサインイン</button>
+      </section>
+
+      <section id="app-panel" hidden>
+        <div class="panel create-panel">
+          <div class="section-heading">
+            <div><p class="eyebrow">CREATE</p><h2>アイテムを追加</h2></div>
+          </div>
+          <form id="create-form" class="stack">
+            <label for="item-json">保存する JSON</label>
+            <textarea id="item-json" rows="5" spellcheck="false">{"title":"hello"}</textarea>
+            <div class="button-row">
+              <button id="create-item" class="button" type="submit">作成</button>
+              <button id="update-item" class="button" type="button" hidden>更新を保存</button>
+              <button id="cancel-edit" class="button button-quiet" type="button" hidden>編集をやめる</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="section-heading list-heading">
+          <div><p class="eyebrow">YOUR DATA</p><h2>アイテム一覧</h2></div>
+          <div class="button-row">
+            <button id="previous-page" class="button button-quiet" type="button" hidden>前へ</button>
+            <button id="next-page" class="button button-quiet" type="button" hidden>次へ</button>
+            <button id="refresh-items" class="button button-quiet" type="button">更新</button>
+          </div>
+        </div>
+        <div id="items-list" class="items-list" aria-live="polite"></div>
+
+        <section class="panel detail-panel">
+          <div class="section-heading"><div><p class="eyebrow">READ</p><h2>ID で取得</h2></div></div>
+          <form id="get-form" class="inline-form">
+            <label class="visually-hidden" for="item-id">アイテム ID</label>
+            <input id="item-id" placeholder="アイテム ID" required>
+            <button class="button button-quiet" type="submit">取得</button>
+          </form>
+          <pre id="item-detail" class="detail-output" hidden></pre>
+        </section>
+      </section>
+
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <footer>HTML on S3 · API Gateway · Lambda · DynamoDB</footer>
+    </main>
+  </body>
+</html>

@@ -26,7 +26,12 @@ resource "aws_iam_role" "lambda" {
 
 data "aws_iam_policy_document" "lambda_permissions" {
   statement {
-    actions   = ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:DeleteItem"]
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:GetItem",
+      "dynamodb:UpdateItem",
+      "dynamodb:DeleteItem",
+    ]
     resources = [var.table_arn]
   }
 
@@ -40,6 +45,20 @@ resource "aws_iam_role_policy" "lambda" {
   name   = "least-privilege"
   role   = aws_iam_role.lambda.id
   policy = data.aws_iam_policy_document.lambda_permissions.json
+}
+
+resource "aws_iam_role_policy" "lambda_index_query" {
+  name = "query-owner-items"
+  role = aws_iam_role.lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["dynamodb:Query"]
+      Resource = "${var.table_arn}/index/owner_id-created_at-index"
+    }]
+  })
 }
 
 resource "aws_lambda_function" "handler" {
